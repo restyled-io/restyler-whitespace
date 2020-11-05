@@ -1,4 +1,9 @@
-module Main where
+module Main
+    ( main
+    )
+where
+
+import RIO
 
 import Options.Applicative
 import Whitespace
@@ -6,7 +11,7 @@ import Whitespace
 main :: IO ()
 main = do
     opts <- execParser $ info (options <**> helper) fullDesc
-    formatPaths opts
+    runSimpleApp $ formatPaths opts
 
 -- brittany-disable-next-binding
 

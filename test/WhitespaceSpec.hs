@@ -1,9 +1,11 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -Wno-missing-local-signatures #-}
 
 module WhitespaceSpec
     ( spec
     )
 where
+
+import RIO
 
 import Test.Hspec
 import Whitespace

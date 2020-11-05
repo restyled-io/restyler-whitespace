@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Whitespace
     ( FormatOptions(..)
     , formatPaths
@@ -7,16 +5,11 @@ module Whitespace
     )
 where
 
-import Control.Exception (Exception, SomeException, handle, throwIO)
-import Control.Monad (when)
-import Data.Bool (bool)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
+import RIO
+
 import qualified Data.ByteString.Char8 as C8
 import Data.Char (isSpace)
-import Data.Foldable (traverse_)
-import System.Exit (ExitCode(ExitFailure), exitWith)
-import System.IO (hPrint, hPutStrLn, stderr)
+import qualified RIO.ByteString as BS
 
 data FormatOptions = FormatOptions
     { foSpaces :: Bool -- ^ Trim trailing whitespace from lines?
@@ -25,15 +18,22 @@ data FormatOptions = FormatOptions
     , foPaths :: [FilePath] -- ^ Files to process
     }
 
-formatPaths :: FormatOptions -> IO ()
+formatPaths
+    :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
+    => FormatOptions
+    -> m ()
 formatPaths opts = traverse_ (formatPath opts) $ foPaths opts
 
-data UnableToFormat = UnableToFormatCRLF deriving Show
+data UnableToFormat = UnableToFormatCRLF
+    deriving stock Show
+    deriving anyclass Exception
 
-instance Exception UnableToFormat
-
-formatPath :: FormatOptions -> FilePath -> IO ()
-formatPath opts path = handle (onException (foStrict opts) path) $ do
+formatPath
+    :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
+    => FormatOptions
+    -> FilePath
+    -> m ()
+formatPath opts path = handleAny (handleErr (foStrict opts) path) $ do
     content <- BS.readFile path
     if isCRLF content
         then throwIO UnableToFormatCRLF
@@ -62,11 +62,21 @@ eachLine f = C8.unlines . map f . C8.lines
 withEnd :: (ByteString -> ByteString) -> ByteString -> ByteString
 withEnd f = C8.reverse . f . C8.reverse
 
-onException :: Bool -> FilePath -> SomeException -> IO ()
-onException strict path ex = do
-    hPutStrLn stderr $ "Exception processing " <> path <> ":"
-    hPrint stderr ex
-
-    when strict $ do
-        hPutStrLn stderr "Aborting, disable strict mode to ignore."
+handleErr
+    :: (MonadIO m, MonadReader env m, HasLogFunc env, Display ex)
+    => Bool
+    -> FilePath
+    -> ex
+    -> m ()
+handleErr strict path ex
+    | strict
+    = do
+        logError
+            $ "Exception processing "
+            <> fromString path
+            <> ":"
+            <> display ex
+            <> ", aborting (disable strict mode to ignore)"
         exitWith $ ExitFailure 1
+    | otherwise
+    = logWarn $ "Exception processing " <> fromString path <> ":" <> display ex
