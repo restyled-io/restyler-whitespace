@@ -1,15 +1,18 @@
 module Whitespace
     ( FormatOptions(..)
     , formatPaths
+    , formatPath
     , format
+
+    -- Exported for testing error-handling
+    , UnableToFormat(..)
     )
 where
 
 import RIO
 
-import qualified Data.ByteString.Char8 as C8
-import Data.Char (isSpace)
-import qualified RIO.ByteString as BS
+import RIO.Char (isSpace)
+import qualified RIO.Text as T
 
 data FormatOptions = FormatOptions
     { foSpaces :: Bool -- ^ Trim trailing whitespace from lines?
@@ -25,39 +28,38 @@ formatPaths
 formatPaths opts = for_ (foPaths opts) $ \path ->
     handleAny (handleErr (foStrict opts) path) $ formatPath opts path
 
-data UnableToFormat = UnableToFormatCRLF
+data UnableToFormat
+    = UnableToFormatCRLF
+    | UnableToRead SomeException -- ^ Most likely non-Utf8
     deriving stock Show
     deriving anyclass Exception
 
 formatPath :: MonadUnliftIO m => FormatOptions -> FilePath -> m ()
 formatPath opts path = do
-    content <- BS.readFile path
+    content <- readFileUtf8 path `catchAny` (throwIO . UnableToRead)
     if isCRLF content
         then throwIO UnableToFormatCRLF
-        else BS.writeFile path $ format opts content
+        else writeFileUtf8 path $ format opts content
 
-isCRLF :: ByteString -> Bool
-isCRLF = ("\r\n" `C8.isInfixOf`)
+isCRLF :: Text -> Bool
+isCRLF = ("\r\n" `T.isInfixOf`)
 
-format :: FormatOptions -> ByteString -> ByteString
-format opts bs
-    | BS.null bs = bs
-    | otherwise = onOpt foNewlines newlines $ onOpt foSpaces spaces bs
+format :: FormatOptions -> Text -> Text
+format opts t
+    | T.null t = t
+    | otherwise = onOpt foNewlines newlines $ onOpt foSpaces spaces t
     where onOpt attr f = bool id f $ attr opts
 
 -- | Ensure a single trailing newline
-newlines :: ByteString -> ByteString
-newlines = withEnd $ C8.cons '\n' . C8.dropWhile (== '\n')
+newlines :: Text -> Text
+newlines = (<> "\n") . T.dropWhileEnd (== '\n')
 
 -- | Trim whitespace from the end of all lines
-spaces :: ByteString -> ByteString
-spaces = eachLine $ withEnd $ C8.dropWhile isSpace
+spaces :: Text -> Text
+spaces = eachLine $ T.dropWhileEnd isSpace
 
-eachLine :: (ByteString -> ByteString) -> ByteString -> ByteString
-eachLine f = C8.unlines . map f . C8.lines
-
-withEnd :: (ByteString -> ByteString) -> ByteString -> ByteString
-withEnd f = C8.reverse . f . C8.reverse
+eachLine :: (Text -> Text) -> Text -> Text
+eachLine f = T.unlines . map f . T.lines
 
 handleErr
     :: (MonadIO m, MonadReader env m, HasLogFunc env, Display ex)
