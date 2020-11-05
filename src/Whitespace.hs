@@ -22,18 +22,15 @@ formatPaths
     :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
     => FormatOptions
     -> m ()
-formatPaths opts = traverse_ (formatPath opts) $ foPaths opts
+formatPaths opts = for_ (foPaths opts) $ \path ->
+    handleAny (handleErr (foStrict opts) path) $ formatPath opts path
 
 data UnableToFormat = UnableToFormatCRLF
     deriving stock Show
     deriving anyclass Exception
 
-formatPath
-    :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
-    => FormatOptions
-    -> FilePath
-    -> m ()
-formatPath opts path = handleAny (handleErr (foStrict opts) path) $ do
+formatPath :: MonadUnliftIO m => FormatOptions -> FilePath -> m ()
+formatPath opts path = do
     content <- BS.readFile path
     if isCRLF content
         then throwIO UnableToFormatCRLF
