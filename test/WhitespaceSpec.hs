@@ -20,37 +20,44 @@ spec = do
             , foPaths = [] -- Unused
             }
 
-    it "strips trailing whitespace from the given content" $ do
-        let content = mconcat
-                [ "line one  "
-                , "\nline two "
-                , "\n "
-                , "\nline three \\" -- preserved
-                , "\n"
-                ]
-            expected = mconcat
-                ["line one", "\nline two", "\n", "\nline three \\", "\n"]
-
-        format opts content `shouldBe` expected
-        format opts { foSpaces = False } content `shouldBe` content
-
-    it "strips extra newlines from the end of the content" $ do
-        let content =
-                mconcat
-                    [ "line one"
-                    , "\nline two"
-                    , "\n"
-                    , "\n"
-                    , "\nline three"
-                    , "\n"
-                    , "\n"
+    describe "format" $ do
+        it "strips trailing whitespace from the given content" $ do
+            let content = mconcat
+                    [ "line one  "
+                    , "\nline two "
+                    , "\n "
+                    , "\nline three \\" -- preserved
                     , "\n"
                     ]
-            expected =
-                mconcat ["line one", "\nline two", "\n\n", "\nline three", "\n"]
+                expected =
+                    mconcat
+                        [ "line one"
+                        , "\nline two"
+                        , "\n"
+                        , "\nline three \\"
+                        , "\n"
+                        ]
 
-        format opts content `shouldBe` expected
-        format opts { foNewlines = False } content `shouldBe` content
+            format opts content `shouldBe` expected
+            format opts { foSpaces = False } content `shouldBe` content
 
-    it "does not affect completely empty files" $ do
-        format opts "" `shouldBe` ""
+        it "strips extra newlines from the end of the content" $ do
+            let content =
+                    mconcat
+                        [ "line one"
+                        , "\nline two"
+                        , "\n"
+                        , "\n"
+                        , "\nline three"
+                        , "\n"
+                        , "\n"
+                        , "\n"
+                        ]
+                expected = mconcat
+                    ["line one", "\nline two", "\n\n", "\nline three", "\n"]
+
+            format opts content `shouldBe` expected
+            format opts { foNewlines = False } content `shouldBe` content
+
+        it "does not affect completely empty files" $ do
+            format opts "" `shouldBe` ""
