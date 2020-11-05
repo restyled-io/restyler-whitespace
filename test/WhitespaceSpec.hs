@@ -20,6 +20,14 @@ spec = do
             , foPaths = [] -- Unused
             }
 
+    describe "formatPath" $ do
+        it "doesn't incorrectly format non-utf8" $ do
+            let path = "test/fixtures/non-utf8.yaml"
+
+            runSimpleApp (formatPath opts path) `shouldThrow` \case
+                UnableToRead _ -> True
+                _ -> False
+
     describe "format" $ do
         it "strips trailing whitespace from the given content" $ do
             let content = mconcat
