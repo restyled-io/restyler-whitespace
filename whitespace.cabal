@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 035e641c6ddfa37a22be3ae63ac018818a57b9365e39db6fe7bd94504cbde569
+-- hash: 3b7c1adf415e2248bf62f6ec479ef53cc08acca4d1d5edb04dbf00d8836bc41e
 
 name:           whitespace
 version:        0.2.0.0
@@ -20,7 +20,7 @@ library
   hs-source-dirs:
       src
   default-extensions: BangPatterns DataKinds DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses NoImplicitPrelude NoMonomorphismRestriction OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TypeApplications TypeFamilies
-  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists -Wno-all-missed-specialisations
   build-depends:
       base >=4.7 && <5
     , bytestring
@@ -34,7 +34,7 @@ executable whitespace
   hs-source-dirs:
       app
   default-extensions: BangPatterns DataKinds DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses NoImplicitPrelude NoMonomorphismRestriction OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TypeApplications TypeFamilies
-  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists -Wno-all-missed-specialisations -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , optparse-applicative
@@ -51,7 +51,7 @@ test-suite whitespace-test
   hs-source-dirs:
       test
   default-extensions: BangPatterns DataKinds DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses NoImplicitPrelude NoMonomorphismRestriction OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TypeApplications TypeFamilies
-  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-import-lists -Wno-all-missed-specialisations -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , hspec
