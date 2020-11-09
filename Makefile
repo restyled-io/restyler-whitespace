@@ -8,4 +8,4 @@ release:
 	git tag --sign --message $(VERSION) $(VERSION)
 	git push --follow-tags
 	@echo
-	@echo "image: restyled/restyler-whitespace:$(VERISION)"
+	@echo "image: restyled/restyler-whitespace:$(VERSION)"
