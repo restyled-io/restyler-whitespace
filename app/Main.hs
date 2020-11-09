@@ -5,18 +5,36 @@ where
 
 import RIO
 
+import Data.Version (showVersion)
 import Options.Applicative
+import qualified Paths_whitespace as Pkg
 import Whitespace
 
 main :: IO ()
 main = do
-    opts <- execParser $ info (options <**> helper) fullDesc
-    runSimpleApp $ formatPaths opts
+    Options {..} <- execParser $ info (options <**> helper) fullDesc
+
+    runSimpleApp $ do
+        if oShowVersion
+            then logInfo $ "whitespace " <> fromString (showVersion Pkg.version)
+            else formatPaths oFormatOptions
+
+data Options = Options
+    { oShowVersion :: Bool
+    , oFormatOptions :: FormatOptions
+    }
 
 -- brittany-disable-next-binding
 
-options :: Parser FormatOptions
-options =
+options :: Parser Options
+options = Options
+    <$> switch (long "version" <> help "Show version")
+    <*> formatOptions
+
+-- brittany-disable-next-binding
+
+formatOptions :: Parser FormatOptions
+formatOptions =
     FormatOptions
         <$> (not <$> switch (long "no-remove-spaces" <> help "Don't remove trailing spaces"))
         <*> (not <$> switch (long "no-fix-newlines" <> help "Don't fix ending newlines"))
