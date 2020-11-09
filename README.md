@@ -15,3 +15,7 @@ Available options:
   PATH                     File to fix (inplace)
   -h,--help                Show this help text
 ```
+
+---
+
+[LICENSE](./LICENSE) | [CHANGELOG](./CHANGELOG.md)
