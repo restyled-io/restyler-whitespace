@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5d8c0fb81779021e22e3fc9e28c844ae0d918afda8493c1bf1964a6b9ccd7f40
+-- hash: 035e641c6ddfa37a22be3ae63ac018818a57b9365e39db6fe7bd94504cbde569
 
 name:           whitespace
-version:        0.1.0.1
+version:        0.2.0.0
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
