@@ -8,10 +8,14 @@ module Whitespace
   )
 where
 
-import RIO
+import Relude
 
-import RIO.Char (isSpace)
-import RIO.Text qualified as T
+import Blammo.Logging
+import Blammo.Logging.ThreadContext
+import Data.Char (isSpace)
+import Data.Text qualified as T
+import UnliftIO (MonadUnliftIO)
+import UnliftIO.Exception (handleAny, throwIO)
 
 data FormatOptions = FormatOptions
   { spaces :: Bool
@@ -25,7 +29,7 @@ data FormatOptions = FormatOptions
   }
 
 formatPaths
-  :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
+  :: (MonadLogger m, MonadMask m, MonadUnliftIO m)
   => FormatOptions
   -> m ()
 formatPaths opts = for_ opts.paths $ \path ->
@@ -33,17 +37,17 @@ formatPaths opts = for_ opts.paths $ \path ->
 
 data UnableToFormat
   = UnableToFormatCRLF
-  | -- | Most likely non-Utf8
-    UnableToRead SomeException
+  | UnableToRead UnicodeException
   deriving stock (Show)
   deriving anyclass (Exception)
 
 formatPath :: MonadUnliftIO m => FormatOptions -> FilePath -> m ()
 formatPath opts path = do
-  content <- readFileUtf8 path `catchAny` (throwIO . UnableToRead)
+  result <- decodeUtf8Strict <$> readFileBS path
+  content <- either (throwIO . UnableToRead) pure result
   if isCRLF content
     then throwIO UnableToFormatCRLF
-    else writeFileUtf8 path $ format opts content
+    else writeFileText path $ format opts content
 
 isCRLF :: Text -> Bool
 isCRLF = ("\r\n" `T.isInfixOf`)
@@ -67,20 +71,19 @@ eachLine :: (Text -> Text) -> Text -> Text
 eachLine f = T.unlines . map f . T.lines
 
 handleErr
-  :: (MonadIO m, MonadReader env m, HasLogFunc env, Display ex)
+  :: (Exception ex, MonadIO m, MonadLogger m, MonadMask m)
   => Bool
   -> FilePath
   -> ex
   -> m ()
-handleErr strict path ex
-  | strict =
-      do
-        logError
-          $ "Exception processing "
-          <> fromString path
-          <> ":"
-          <> display ex
-          <> ", aborting (disable strict mode to ignore)"
-        exitWith $ ExitFailure 1
-  | otherwise =
-      logWarn $ "Exception processing " <> fromString path <> ":" <> display ex
+handleErr strict path ex = withThreadContext ctx $ do
+  if strict
+    then do
+      logError "Exception processing file, aborting (disable strict mode to ignore)"
+      exitFailure
+    else logWarn "Exception processing file"
+ where
+  ctx =
+    [ "path" .= path
+    , "exception" .= displayException ex
+    ]

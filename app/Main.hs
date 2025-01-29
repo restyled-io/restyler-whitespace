@@ -3,8 +3,9 @@ module Main
   )
 where
 
-import RIO
+import Relude
 
+import Blammo.Logging.Simple
 import Data.Version (showVersion)
 import Options.Applicative
 import Paths_whitespace qualified as Pkg
@@ -14,9 +15,9 @@ main :: IO ()
 main = do
   opts <- execParser $ info (options <**> helper) fullDesc
 
-  runSimpleApp $ do
+  runSimpleLoggingT $ do
     if opts.showVersion
-      then logInfo $ "whitespace " <> fromString (showVersion Pkg.version)
+      then putStrLn $ "whitespace " <> showVersion Pkg.version
       else formatPaths opts.formatOptions
 
 data Options = Options

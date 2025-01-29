@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: da0292cd6e405f0a5588ce3bb2c4955fd33ae873f3e27fc08e35b7437dbb9c01
+-- hash: 7a6c71819d1c4d2b39f2366c1c1332010af0bc17408d0af5d4716c8fc23df04f
 
 name:           whitespace
 version:        0.2.0.0
@@ -37,8 +37,10 @@ library
       TypeFamilies
   ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-unsafe
   build-depends:
-      base >=4.11 && <5
-    , rio
+      Blammo
+    , base >=4.11 && <5
+    , relude
+    , unliftio
   default-language: GHC2021
 
 executable whitespace
@@ -65,9 +67,10 @@ executable whitespace
       TypeFamilies
   ghc-options: -Weverything -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-safe-haskell-mode -Wno-unsafe -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.11 && <5
+      Blammo
+    , base >=4.11 && <5
     , optparse-applicative
-    , rio
+    , relude
     , whitespace
   default-language: GHC2021
 
@@ -99,6 +102,7 @@ test-suite whitespace-test
   build-depends:
       base >=4.11 && <5
     , hspec
-    , rio
+    , monad-logger
+    , relude
     , whitespace
   default-language: GHC2021
