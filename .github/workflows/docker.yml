@@ -20,7 +20,7 @@ jobs:
       - id: meta
         uses: docker/metadata-action@v5
         with:
-          images: restyled-io/restylers-whitespace
+          images: restyled/restylers-whitespace
 
       - uses: docker/setup-buildx-action@v3
       - uses: docker/build-push-action@v6
