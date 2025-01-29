@@ -24,15 +24,11 @@ data Options = Options
   , formatOptions :: FormatOptions
   }
 
--- brittany-disable-next-binding
-
 options :: Parser Options
 options =
   Options
     <$> switch (long "version" <> help "Show version")
     <*> formatOptions
-
--- brittany-disable-next-binding
 
 formatOptions :: Parser FormatOptions
 formatOptions =
