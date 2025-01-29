@@ -14,13 +14,13 @@ import RIO.Char (isSpace)
 import RIO.Text qualified as T
 
 data FormatOptions = FormatOptions
-  { foSpaces :: Bool
+  { spaces :: Bool
   -- ^ Trim trailing whitespace from lines?
-  , foNewlines :: Bool
+  , newlines :: Bool
   -- ^ Fix newlines at end of file?
-  , foStrict :: Bool
+  , strict :: Bool
   -- ^ Halt on errors reading files?
-  , foPaths :: [FilePath]
+  , paths :: [FilePath]
   -- ^ Files to process
   }
 
@@ -28,8 +28,8 @@ formatPaths
   :: (MonadUnliftIO m, MonadReader env m, HasLogFunc env)
   => FormatOptions
   -> m ()
-formatPaths opts = for_ (foPaths opts) $ \path ->
-  handleAny (handleErr (foStrict opts) path) $ formatPath opts path
+formatPaths opts = for_ opts.paths $ \path ->
+  handleAny (handleErr opts.strict path) $ formatPath opts path
 
 data UnableToFormat
   = UnableToFormatCRLF
@@ -51,7 +51,7 @@ isCRLF = ("\r\n" `T.isInfixOf`)
 format :: FormatOptions -> Text -> Text
 format opts t
   | T.null t = t
-  | otherwise = onOpt foNewlines newlines $ onOpt foSpaces spaces t
+  | otherwise = onOpt (.newlines) newlines $ onOpt (.spaces) spaces t
  where
   onOpt attr f = bool id f $ attr opts
 

@@ -14,10 +14,10 @@ spec :: Spec
 spec = do
   let opts =
         FormatOptions
-          { foSpaces = True
-          , foNewlines = True
-          , foStrict = True -- Unused
-          , foPaths = [] -- Unused
+          { spaces = True
+          , newlines = True
+          , strict = True -- Unused
+          , paths = [] -- Unused
           }
 
   describe "formatPath" $ do
@@ -49,7 +49,7 @@ spec = do
             ]
 
       format opts content `shouldBe` expected
-      format opts {foSpaces = False} content `shouldBe` content
+      format opts {spaces = False} content `shouldBe` content
 
     it "strips extra newlines from the end of the content" $ do
       let
@@ -69,7 +69,7 @@ spec = do
             ["line one", "\nline two", "\n\n", "\nline three", "\n"]
 
       format opts content `shouldBe` expected
-      format opts {foNewlines = False} content `shouldBe` content
+      format opts {newlines = False} content `shouldBe` content
 
     it "does not affect completely empty files" $ do
       format opts "" `shouldBe` ""

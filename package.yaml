@@ -2,45 +2,40 @@ name: whitespace
 version: 0.2.0.0
 license: MIT
 
+dependencies:
+  - base >= 4.11 && < 5
+  - rio # TODO
+
+ghc-options:
+  - -Weverything
+  - -Wno-missing-import-lists
+  - -Wno-missing-kind-signatures
+  - -Wno-missing-poly-kind-signatures
+  - -Wno-missing-role-annotations
+  - -Wno-missing-safe-haskell-mode
+  - -Wno-unsafe
+
+language: GHC2021
+
 default-extensions:
-  - BangPatterns
   - DataKinds
   - DeriveAnyClass
-  - DeriveFoldable
-  - DeriveFunctor
-  - DeriveGeneric
-  - DeriveLift
-  - DeriveTraversable
   - DerivingStrategies
-  - FlexibleContexts
-  - FlexibleInstances
+  - DerivingVia
+  - DuplicateRecordFields
   - GADTs
-  - GeneralizedNewtypeDeriving
   - LambdaCase
-  - MultiParamTypeClasses
+  - NoFieldSelectors
   - NoImplicitPrelude
   - NoMonomorphismRestriction
+  - NoPostfixOperators
+  - OverloadedRecordDot
   - OverloadedStrings
-  - RankNTypes
-  - RecordWildCards
-  - ScopedTypeVariables
-  - StandaloneDeriving
-  - TypeApplications
+  - QuasiQuotes
   - TypeFamilies
-
-ghc-options: -Weverything
-  -Wno-unsafe
-  -Wno-missing-import-lists
-  -Wno-all-missed-specialisations
-
-dependencies:
-  - base >= 4.7 && < 5
-  - rio
 
 library:
   source-dirs: src
-  dependencies:
-    - bytestring
 
 executables:
   whitespace:
