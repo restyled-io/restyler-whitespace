@@ -3,15 +3,16 @@ name: Docker
 on:
   pull_request:
 
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+.[0-9]+' # PVP version
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
       # Only log in if we're going to push
-      - if: ${{ github.event_name == 'release' }}
+      - if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -29,7 +30,7 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event_name == 'push' }}
 
   hadolint:
     runs-on: ubuntu-latest
