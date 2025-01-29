@@ -4,7 +4,6 @@ license: MIT
 
 dependencies:
   - base >= 4.11 && < 5
-  - rio # TODO
 
 ghc-options:
   - -Weverything
@@ -36,6 +35,10 @@ default-extensions:
 
 library:
   source-dirs: src
+  dependencies:
+    - Blammo
+    - relude
+    - unliftio
 
 executables:
   whitespace:
@@ -46,7 +49,9 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
     dependencies:
+      - Blammo
       - optparse-applicative
+      - relude
       - whitespace
 
 tests:
@@ -59,4 +64,6 @@ tests:
       - -with-rtsopts=-N
     dependencies:
       - hspec
+      - monad-logger
+      - relude
       - whitespace
