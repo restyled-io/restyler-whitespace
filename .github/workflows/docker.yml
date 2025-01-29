@@ -30,3 +30,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name == 'release' }}
+
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hadolint/hadolint-action@master
