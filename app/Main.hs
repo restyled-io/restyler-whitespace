@@ -12,16 +12,16 @@ import Whitespace
 
 main :: IO ()
 main = do
-  Options {..} <- execParser $ info (options <**> helper) fullDesc
+  opts <- execParser $ info (options <**> helper) fullDesc
 
   runSimpleApp $ do
-    if oShowVersion
+    if opts.showVersion
       then logInfo $ "whitespace " <> fromString (showVersion Pkg.version)
-      else formatPaths oFormatOptions
+      else formatPaths opts.formatOptions
 
 data Options = Options
-  { oShowVersion :: Bool
-  , oFormatOptions :: FormatOptions
+  { showVersion :: Bool
+  , formatOptions :: FormatOptions
   }
 
 -- brittany-disable-next-binding

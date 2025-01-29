@@ -1,3 +1,1 @@
-resolver: lts-16.10
-ghc-options:
-  "$locals": -fwrite-ide-info
+resolver: lts-23.4
